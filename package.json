@@ -90,7 +90,7 @@
     }
   },
   "dependencies": {
-    "undici": "^7.29.1"
+    "undici": "^8.10.2"
   },
   "peerDependencies": {
     "@jest/test-sequencer": "^29.7.0 || ^30.0.0",
