@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist"
+  },
+  "include": [
+    "doqa-client/src/**/*.ts",
+    "doqa-js-commons/src/**/*.ts",
+    "doqa-jest/src/**/*.ts"
+  ]
+}

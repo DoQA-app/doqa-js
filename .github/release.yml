@@ -1,0 +1,15 @@
+# Release-notes categories; PRs are forced to carry a type: label by workflows/labels.yml.
+changelog:
+  exclude:
+    labels: [ "type:skip-changelog" ]
+  categories:
+    - title: "🚀 Новое"
+      labels: [ "type:feature" ]
+    - title: "🐞 Исправления"
+      labels: [ "type:bug" ]
+    - title: "📖 Документация"
+      labels: [ "type:docs" ]
+    - title: "⬆️ Зависимости"
+      labels: [ "type:dependencies" ]
+    - title: "🔧 Внутреннее"
+      labels: [ "type:internal" ]

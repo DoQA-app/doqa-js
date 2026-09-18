@@ -1,0 +1,102 @@
+name: Release
+
+# Publishes the package on a version tag (v0.1.1 -> 0.1.1) through npm Trusted Publishing (OIDC).
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - run: npm run version:check
+
+  tests:
+    needs: verify-version
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Pack release
+        run: npm run pack
+      - run: npm run test:packages
+      - uses: actions/upload-artifact@v7
+        with:
+          name: npm-dist
+          path: release-dist/*.tgz
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11
+      - uses: actions/download-artifact@v8
+        with:
+          name: npm-dist
+          path: release-dist/
+      - name: Publish to npm
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # The first version is uploaded by hand (a trusted publisher needs an existing package).
+          if npm view "@doqa-tms/jest@${version}" version >/dev/null 2>&1; then
+            echo "@doqa-tms/jest@${version} is already on npm - nothing to upload"
+            exit 0
+          fi
+          npm_tag=latest
+          if [[ "${GITHUB_REF_NAME#v}" == *-* ]]; then
+            npm_tag=next
+          fi
+          npm publish "./release-dist/doqa-tms-jest-${GITHUB_REF_NAME#v}.tgz" --access public --tag "$npm_tag"
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: npm-dist
+          path: release-dist/
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "GitHub Release $GITHUB_REF_NAME already exists"
+          else
+            release_flags=()
+            if [[ "${GITHUB_REF_NAME#v}" == *-* ]]; then
+              release_flags+=(--prerelease)
+            fi
+            gh release create "$GITHUB_REF_NAME" ./release-dist/*.tgz \
+              --repo "$GITHUB_REPOSITORY" --generate-notes --verify-tag "${release_flags[@]}"
+          fi
