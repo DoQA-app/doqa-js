@@ -1,0 +1,12 @@
+const assert = require("node:assert/strict");
+const pkg = require("../package.json");
+const lock = require("../package-lock.json");
+assert.equal(pkg.name, "@doqa-tms/jest");
+assert.ok(!pkg.private && !pkg.workspaces);
+assert.equal(lock.name, pkg.name);
+assert.equal(lock.version, pkg.version);
+assert.equal(lock.packages[""].name, pkg.name);
+assert.equal(lock.packages[""].version, pkg.version);
+assert.ok(!Object.values(lock.packages).some(value => value.link || value.extraneous));
+if (process.env.GITHUB_REF_TYPE === "tag") assert.equal(process.env.GITHUB_REF_NAME, `v${pkg.version}`);
+console.log(`${pkg.name}@${pkg.version}: manifest and lockfile match`);

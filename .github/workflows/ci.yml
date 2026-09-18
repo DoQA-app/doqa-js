@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref_type != 'tag' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both supported Node lines and the oldest supported Jest release.
+        node: [22, 24]
+        jest: ["29.7.0", "30"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run version:check
+      - run: npm install --no-save jest@${{ matrix.jest }} jest-environment-node@${{ matrix.jest }} jest-environment-jsdom@${{ matrix.jest }} @jest/test-sequencer@${{ matrix.jest }}
+      - run: npm run lint
+      - run: npm test
+      - run: npm run pack
+      - run: npm run test:packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: doqa-js-node${{ matrix.node }}-jest${{ matrix.jest }}
+          path: "release-dist/*.tgz"
+          if-no-files-found: error
