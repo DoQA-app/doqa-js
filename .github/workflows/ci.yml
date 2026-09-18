@@ -35,7 +35,7 @@ jobs:
       - run: npm test
       - run: npm run pack
       - run: npm run test:packages
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: doqa-js-node${{ matrix.node }}-jest${{ matrix.jest }}
           path: "release-dist/*.tgz"
