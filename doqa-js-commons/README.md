@@ -94,13 +94,13 @@ await coordinator.complete();
    ничего не записывает: так работает `reporting=off`.
 3. **Жизненный цикл теста.** При старте теста выполните его внутри
    `runtime.context.run({ result }, () => …)`, где `runtime = new Runtime(sessionDir, maxMessageLength)`,
-   а `result` — объект `RecordResult` (id, `namespace`, `classname`, `runner_method`, `metadata` и
+   а `result` это объект `RecordResult` (id, `namespace`, `classname`, `runner_method`, `metadata` и
    другие поля). После завершения теста сохраните запись:
    `atomic(join(sessionDir, '<имя>.record.json'), result)`. Координатор читает записи в порядке
    сортировки имён файлов.
 4. **Отбор и порядок (необязательно).** Если фреймворк позволяет отбирать тесты до выполнения,
    используйте `session.plan`: исключите тесты, которых нет в плане, и отсортируйте остальные по
-   позиции в плане. После выполнения каждой части прогона (в Jest — тестового файла) запишите файл
+   позиции в плане. После выполнения каждой части прогона (в Jest это тестовый файл) запишите файл
    `*.summary.json` с полями `selected`,
    `unreported`, `duplicates` и `notes`: по нему `coordinator.complete()` выводит сводные
    предупреждения.

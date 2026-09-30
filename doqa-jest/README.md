@@ -192,21 +192,21 @@ unset. Check that the CI variable exists and is exported to this job.».
 
 | Ключ | Переменная окружения | По умолчанию | Назначение |
 |---|---|---|---|
-| `url` | `DOQA_URL` | — | адрес DoQA; суффикс `/api` и завершающие `/` отбрасываются |
-| `token` | `DOQA_TOKEN` (`DOQA_PRIVATE_TOKEN`) | — | токен проекта |
-| `spaceId` | `DOQA_SPACE_ID` (`DOQA_PROJECT_ID`) | — | id пространства |
+| `url` | `DOQA_URL` | нет | адрес DoQA; суффикс `/api` и завершающие `/` отбрасываются |
+| `token` | `DOQA_TOKEN` (`DOQA_PRIVATE_TOKEN`) | нет | токен проекта |
+| `spaceId` | `DOQA_SPACE_ID` (`DOQA_PROJECT_ID`) | нет | id пространства |
 | `reporting` | `DOQA_REPORTING` | `auto` | `api` / `files` / `auto` / `off`, см. [выше](#выбор-способа-отправки-reporting) |
 | `adapterMode` | `DOQA_ADAPTER_MODE` | `2` (`1`, если задан `testRunId`) | `0`/`selective`, `1`/`existing`, `2`/`new`, см. [режимы прогона](#режимы-прогона) |
-| `testRunId` | `DOQA_TEST_RUN_ID` | — | прогон для режимов 0 и 1 |
+| `testRunId` | `DOQA_TEST_RUN_ID` | нет | прогон для режимов 0 и 1 |
 | `testRunName` | `DOQA_TEST_RUN_NAME` | `Jest` | имя нового прогона (режим 2) |
-| `configurationId` | `DOQA_CONFIGURATION_ID` | — | конфигурация прогона |
-| `environment` | `DOQA_ENVIRONMENT` | — | метка окружения прогона; в файловом режиме записывается в `environment.properties` |
-| `ciRunId` | `DOQA_CI_RUN_ID` | — | запуск CI, который инициировал DoQA |
+| `configurationId` | `DOQA_CONFIGURATION_ID` | нет | конфигурация прогона |
+| `environment` | `DOQA_ENVIRONMENT` | нет | метка окружения прогона; в файловом режиме записывается в `environment.properties` |
+| `ciRunId` | `DOQA_CI_RUN_ID` | нет | запуск CI, который инициировал DoQA |
 | `pipelineId` | `DOQA_PIPELINE_ID` | `CI_PIPELINE_ID` / `GITHUB_RUN_ID` | пайплайн CI, к которому привязывается прогон |
 | `branch` | `DOQA_BRANCH` | `CI_COMMIT_REF_NAME` / `GITHUB_REF_NAME` | ветка прогона |
 | `resultsDir` | `DOQA_RESULTS_DIR` | `results` | каталог для файлов результатов |
 | `importRealtime` | `DOQA_IMPORT_REALTIME` | `false` | отправлять результаты после завершения каждого тестового файла |
-| `executionOrder` | `DOQA_EXECUTION_ORDER` | `jest` | `plan` — выполнять тесты в порядке плана DoQA |
+| `executionOrder` | `DOQA_EXECUTION_ORDER` | `jest` | `plan`: выполнять тесты в порядке плана DoQA |
 | `projectName` | `DOQA_PROJECT_NAME` | `displayName` проекта Jest | различает одинаковые пути в разных `projects`; входит в вычисляемый идентификатор |
 | `batchSize` | `DOQA_BATCH_SIZE` | `100` | максимальное число результатов в одном запросе |
 | `requestTimeoutMs` | `DOQA_REQUEST_TIMEOUT_MS` | `30000` | таймаут HTTP-запроса, мс |
@@ -215,7 +215,7 @@ unset. Check that the CI variable exists and is exported to this job.».
 | `maxTraceLength` | `DOQA_MAX_TRACE_LENGTH` | `100000` | максимальная длина stack trace, символов |
 | `maxMessageLength` | `DOQA_MAX_MESSAGE_LENGTH` | `10000` | максимальная длина сообщения, символов |
 | `maxParameterLength` | `DOQA_MAX_PARAMETER_LENGTH` | `2000` | максимальная длина значения параметра, символов |
-| `proxy` | `DOQA_PROXY` | — | HTTP-прокси `host:port` или полный URL; используется только для запросов адаптера |
+| `proxy` | `DOQA_PROXY` | нет | HTTP-прокси `host:port` или полный URL; используется только для запросов адаптера |
 | `certValidation` | `DOQA_CERT_VALIDATION` | `true` | `false` отключает проверку TLS-сертификата и имени хоста; действует только на запросы адаптера |
 | `config` | `DOQA_CONFIG` | `doqa.properties` | путь к файлу настроек |
 
@@ -357,11 +357,11 @@ single autotest: …».
 
 Кроме идентификатора, адаптер передаёт место теста:
 
-- `namespace` — путь файла через точки, без расширения и суффикса `.test`/`.spec`
+- `namespace`: путь файла через точки, без расширения и суффикса `.test`/`.spec`
   (`tests/checkout.test.ts` → `tests.checkout`);
-- `classname` — цепочка `describe` через пробел;
-- `runner_method` — название теста (для `each` используется шаблон);
-- `runner_name` — полное название теста в Jest (classname и название).
+- `classname`: цепочка `describe` через пробел;
+- `runner_method`: название теста (для `each` используется шаблон);
+- `runner_name`: полное название теста в Jest (classname и название).
 
 ### Параметризованные тесты
 
